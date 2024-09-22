@@ -4,7 +4,7 @@ import { createLogger } from '../../utils/logger.mjs'
 
 const logger = createLogger('auth')
 
-const jwksUrl = 'https://test-endpoint.auth0.com/.well-known/jwks.json'
+const jwksUrl = 'https://dev-3ph6j4jyd3h82a4a.us.auth0.com/.well-known/jwks.json'
 
 export async function handler(event) {
   try {
@@ -47,7 +47,22 @@ async function verifyToken(authHeader) {
   const jwt = jsonwebtoken.decode(token, { complete: true })
 
   // TODO: Implement token verification
-  return undefined;
+  // Lấy kid từ header của token
+  const kid = jwt.header.kid;
+
+  // Lấy JWKS từ Auth0
+  const jwks = await Axios.get(jwksUrl);
+  const signingKey = jwks.data.keys.find(key => key.kid === kid);
+
+  if (!signingKey) {
+    throw new Error('The signing key could not be found.');
+  }
+
+  // Xây dựng khóa công khai
+  const cert = `-----BEGIN CERTIFICATE-----\n${signingKey.x5c[0]}\n-----END CERTIFICATE-----`;
+
+  // Xác minh token với khóa công khai
+  return jsonwebtoken.verify(token, cert, { algorithms: ['RS256'] });
 }
 
 function getToken(authHeader) {
