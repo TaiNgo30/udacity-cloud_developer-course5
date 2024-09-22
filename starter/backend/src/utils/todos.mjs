@@ -1,7 +1,10 @@
 import AWS from 'aws-sdk';
 import { v4 as uuidv4 } from 'uuid';
+import AWSXRay from 'aws-xray-sdk';
 
-const dynamoDb = new AWS.DynamoDB.DocumentClient();
+const XAWS = AWSXRay.captureAWS(AWS);
+
+const dynamoDb = new XAWS.DynamoDB.DocumentClient();
 const todosTable = process.env.TODOS_TABLE;
 const bucketName = process.env.ATTACHMENTS_BUCKET;
 
@@ -98,5 +101,21 @@ export async function generateUploadUrl(todoId) {
     Expires: parseInt(process.env.SIGNED_URL_EXPIRATION)
   });
 
+  const attachmentUrl = `https://${bucketName}.s3.amazonaws.com/${todoId}.png`;
+  await updateTodoAttachmentUrl(todoId, attachmentUrl);
+
   return url;
+}
+
+export async function updateTodoAttachmentUrl(todoId, attachmentUrl) {
+  const params = {
+    TableName: todosTable,
+    Key: { todoId },
+    UpdateExpression: 'set attachmentUrl = :attachmentUrl',
+    ExpressionAttributeValues: {
+      ':attachmentUrl': attachmentUrl
+    }
+  };
+
+  await dynamoDb.update(params).promise();
 }

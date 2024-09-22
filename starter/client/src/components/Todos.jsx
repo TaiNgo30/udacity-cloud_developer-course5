@@ -26,53 +26,60 @@ export function Todos() {
   }
 
   function renderTodosList() {
-    return (
-      <Grid padded>
-        {todos.map((todo, pos) => {
-          return (
-            <Grid.Row key={todo.todoId}>
-              <Grid.Column width={1} verticalAlign="middle">
-                <Checkbox
-                  onChange={() => onTodoCheck(pos)}
-                  checked={todo.done}
-                />
-              </Grid.Column>
-              <Grid.Column width={10} verticalAlign="middle">
-                {todo.name}
-              </Grid.Column>
-              <Grid.Column width={3} floated="right">
-                {todo.dueDate}
-              </Grid.Column>
-              <Grid.Column width={1} floated="right">
-                <Button
-                  icon
-                  color="blue"
-                  onClick={() => onEditButtonClick(todo.todoId)}
-                >
-                  <Icon name="pencil" />
-                </Button>
-              </Grid.Column>
-              <Grid.Column width={1} floated="right">
-                <Button
-                  icon
-                  color="red"
-                  onClick={() => onTodoDelete(todo.todoId)}
-                >
-                  <Icon name="delete" />
-                </Button>
-              </Grid.Column>
-              {todo.attachmentUrl && (
-                <Image src={todo.attachmentUrl} size="small" wrapped />
-              )}
-              <Grid.Column width={16}>
-                <Divider />
-              </Grid.Column>
-            </Grid.Row>
-          )
-        })}
-      </Grid>
-    )
-  }
+  return (
+    <Grid padded>
+      {todos.map((todo, pos) => {
+
+        const imageUrl = todo.attachmentUrl && !todo.attachmentUrl.match(/\.(jpeg|jpg|png|gif)$/)
+          ? `${todo.attachmentUrl}.png` 
+          : todo.attachmentUrl;
+
+        return (
+          <Grid.Row key={todo.todoId}>
+            <Grid.Column width={1} verticalAlign="middle">
+              <Checkbox
+                onChange={() => onTodoCheck(pos)}
+                checked={todo.done}
+              />
+            </Grid.Column>
+            <Grid.Column width={10} verticalAlign="middle">
+              {todo.name}
+            </Grid.Column>
+            <Grid.Column width={3} floated="right">
+              {todo.dueDate}
+            </Grid.Column>
+            <Grid.Column width={1} floated="right">
+              <Button
+                icon
+                color="blue"
+                onClick={() => onEditButtonClick(todo.todoId)}
+              >
+                <Icon name="pencil" />
+              </Button>
+            </Grid.Column>
+            <Grid.Column width={1} floated="right">
+              <Button
+                icon
+                color="red"
+                onClick={() => onTodoDelete(todo.todoId)}
+              >
+                <Icon name="delete" />
+              </Button>
+            </Grid.Column>
+
+            {imageUrl && (
+              <Image src={imageUrl} size="small" wrapped />
+            )}
+
+            <Grid.Column width={16}>
+              <Divider />
+            </Grid.Column>
+          </Grid.Row>
+        );
+      })}
+    </Grid>
+  );
+}
 
   async function onTodoDelete(todoId) {
     try {
@@ -131,8 +138,9 @@ export function Todos() {
           audience: `https://dev-3ph6j4jyd3h82a4a.us.auth0.com/api/v2/`,
           scope: 'read:todos'
         })
-        console.log('Access token: ' + accessToken)
+        // console.log('Access token: ' + accessToken)
         const todos = await getTodos(accessToken)
+        console.log('Fetched todos:', todos)
         setTodos(todos)
         setLoadingTodos(false)
       } catch (e) {

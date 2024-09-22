@@ -4,7 +4,7 @@ import { createLogger } from '../../utils/logger.mjs'
 
 const logger = createLogger('auth')
 
-const jwksUrl = 'https://dev-3ph6j4jyd3h82a4a.us.auth0.com/.well-known/jwks.json'
+const jwksUrl = 'https://dev-3ph6fjy4j3h82a4a.auth0.com/.well-known/jwks.json'
 
 export async function handler(event) {
   try {
@@ -36,7 +36,7 @@ export async function handler(event) {
             Effect: 'Deny',
             Resource: '*'
           }
-        ]
+        ]     
       }
     }
   }
