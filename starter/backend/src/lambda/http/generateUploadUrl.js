@@ -35,7 +35,7 @@ export async function handler(event) {
       };
     }
 
-    const uploadUrl = await generateUploadUrl(todoId);
+    const uploadUrl = await generateUploadUrl(userId, todoId);
     const attachmentUrl = `https://${process.env.ATTACHMENTS_BUCKET}.s3.amazonaws.com/${todoId}`;
     await updateTodoAttachmentUrl(userId, todoId, attachmentUrl);
 

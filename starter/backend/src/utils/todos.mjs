@@ -90,7 +90,7 @@ export async function deleteTodo(userId, todoId) {
  * @param todoId - id of the TODO item to be uploaded
  * @returns - a pre-signed URL to upload the attachment
  */
-export async function generateUploadUrl(todoId) {
+export async function generateUploadUrl(userId, todoId) {
   const s3 = new AWS.S3({
     signatureVersion: 'v4'
   });
@@ -102,15 +102,15 @@ export async function generateUploadUrl(todoId) {
   });
 
   const attachmentUrl = `https://${bucketName}.s3.amazonaws.com/${todoId}.png`;
-  await updateTodoAttachmentUrl(todoId, attachmentUrl);
+  await updateTodoAttachmentUrl(userId, todoId, attachmentUrl);
 
   return url;
 }
 
-export async function updateTodoAttachmentUrl(todoId, attachmentUrl) {
+export async function updateTodoAttachmentUrl(userId, todoId, attachmentUrl) {
   const params = {
     TableName: todosTable,
-    Key: { todoId },
+    Key: { userId, todoId },
     UpdateExpression: 'set attachmentUrl = :attachmentUrl',
     ExpressionAttributeValues: {
       ':attachmentUrl': attachmentUrl

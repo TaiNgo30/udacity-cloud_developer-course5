@@ -16,6 +16,6 @@ export async function deleteTodoBusiness(userId, todoId) {
   return await deleteTodo(userId, todoId)
 }
 
-export async function generateUploadUrlBusiness(todoId) {
-  return await generateUploadUrl(todoId)
+export async function generateUploadUrlBusiness(userId, todoId) {
+  return await generateUploadUrl(userId, todoId)
 }
